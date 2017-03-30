@@ -1,12 +1,18 @@
 class EventsController < ApplicationController
 
+def index
+		@user = User.find(params[:user_id])
+		@events=@user.events.all 
+			render json: {:event => @events}
+end
+
 def create
 		user = User.find_by(params[:user_id])
 		 if user.blank?
 			return render json: {response: 500,msg: "user not found"}
 		end
 
-		user_events = Event.create(event_params) 
+		user_events = user.events.build(event_params) 
 		if user_events.save!
 			render json: {response: 500,msg: "Event Created", events: user_events}
 		else
@@ -14,12 +20,22 @@ def create
 		end
 	end
 
+     
 
-	def index
-		@user = User.find(params[:user_id])
-		@events=@user.events.all 
-			render json: {:event => @events}
-	end
+     def show
+    
+     @event = Event.find(params[:event_id])
+  
+   if @event.present!
+     render json: {:msg => "response code: 200, response message: successfull", events: @event}
+  else
+      render json: {:msg => "response code: 400, response message: Bad request"}
+  end
+    end
+
+	
+
+	
 	
  def update
  	user = User.find_by(params[:user_id])
@@ -31,7 +47,8 @@ def create
  
      render json: {response: 400,msg: "Event Not update"}
   end
-end
+ end
+
 def destroy
     event = Event.find(params[:id])
     if event.destroy

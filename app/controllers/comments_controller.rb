@@ -16,16 +16,22 @@ def index
 
 
 def create
-   @comments = Comment.create(comment_params)
+  @event = Event.find (params[:event_id])
+  if @event.blank?
+    return render json:{response: 200,msg: "user not found"}
+  end
+   @comments = @event.comments.create(comment_params)
  
   if @comments.save
-    render json: {:msg => "response code: 200, response message: successfull", comments: comment}
+    render json: {:msg => "response code: 200, response message: successfull", comments: @comment}
   else
       render json: {:article => "response code: 400, response message: Bad request"}
   end
 end
+
+private
 def comment_params
-		params.require(:comments).permit( :name, :body)
+		params.require(:comments).permit( :name, :body,:user_id)
 	end
 
 end
